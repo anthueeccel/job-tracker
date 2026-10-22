@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // Safeguard against browser extensions / preview interceptors attempting to overwrite getter-only window.fetch
+      (function() {
+        try {
+          var originalFetch = window.fetch ? window.fetch.bind(window) : undefined;
+          var currentFetch = originalFetch;
+          Object.defineProperty(window, 'fetch', {
+            get: function() {
+              return currentFetch;
+            },
+            set: function(newFetch) {
+              currentFetch = newFetch;
+            },
+            configurable: true,
+            enumerable: true
+          });
+        } catch (err) {
+          // Fallback if property cannot be redefined
+        }
+      })();
+    </script>
+    <title>JobTracker Pro - Tech & Management Job Search Pipeline</title>
+    <meta name="description" content="Intelligent spreadsheet replacement for JobsTech and JobsMgm pipelines with stage progress tracking (0/3), Google Calendar sync, follow-up reminders, and tailored resumes." />
+    <meta property="og:title" content="JobTracker Pro - Tech & Management Job Search Pipeline" />
+    <meta property="og:description" content="Intelligent spreadsheet replacement for JobsTech and JobsMgm pipelines with stage progress tracking (0/3), Google Calendar sync, follow-up reminders, and tailored resumes." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-slate-950 text-slate-100 antialiased selection:bg-indigo-500 selection:text-white min-h-screen">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

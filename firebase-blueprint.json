@@ -1,0 +1,218 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Authenticated user profile in JobTracker Pro",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "User UID matching auth.uid",
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "User email address",
+          "maxLength": 254
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User display name",
+          "maxLength": 120
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "User avatar URL",
+          "maxLength": 2048
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Account initialization timestamp",
+          "maxLength": 64
+        }
+      },
+      "required": ["id", "email"]
+    },
+    "JobOpportunity": {
+      "title": "JobOpportunity",
+      "description": "Full job application and interview pipeline record",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique job application identifier",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user UID",
+          "maxLength": 128
+        },
+        "title": {
+          "type": "string",
+          "description": "Job title or position name",
+          "maxLength": 200
+        },
+        "company": {
+          "type": "string",
+          "description": "Hiring organization name",
+          "maxLength": 150
+        },
+        "category": {
+          "type": "string",
+          "description": "Career track classification",
+          "enum": ["JobsTech", "JobsMgm", "Other"]
+        },
+        "status": {
+          "type": "string",
+          "description": "Current pipeline status",
+          "enum": [
+            "applied",
+            "screening",
+            "interviewing",
+            "tech_challenge",
+            "offer",
+            "standby",
+            "rejected",
+            "withdrawn"
+          ]
+        },
+        "statusDate": {
+          "type": "string",
+          "description": "Date when current status was set (YYYY-MM-DD)",
+          "maxLength": 32
+        },
+        "stages": {
+          "type": "array",
+          "description": "List of interview stages"
+        },
+        "location": {
+          "type": "string",
+          "description": "Location or geographic market",
+          "maxLength": 150
+        },
+        "workModel": {
+          "type": "string",
+          "description": "Work model format",
+          "enum": ["remote", "hybrid", "onsite"]
+        },
+        "jobUrl": {
+          "type": "string",
+          "description": "Job posting or career portal link",
+          "maxLength": 2048
+        },
+        "salaryCurrency": {
+          "type": "string",
+          "description": "Currency symbol or code",
+          "maxLength": 10
+        },
+        "salaryExpected": {
+          "type": "string",
+          "description": "Target compensation description",
+          "maxLength": 100
+        },
+        "salaryOffered": {
+          "type": "string",
+          "description": "Offered compensation package",
+          "maxLength": 100
+        },
+        "benefits": {
+          "type": "string",
+          "description": "Perks and benefits summary",
+          "maxLength": 1000
+        },
+        "appliedDate": {
+          "type": "string",
+          "description": "Date applied (YYYY-MM-DD)",
+          "maxLength": 32
+        },
+        "lastActivityDate": {
+          "type": "string",
+          "description": "Last touchpoint or update date (YYYY-MM-DD)",
+          "maxLength": 32
+        },
+        "nextFollowUpDate": {
+          "type": "string",
+          "description": "Next scheduled follow-up outreach (YYYY-MM-DD)",
+          "maxLength": 32
+        },
+        "followUpDaysInterval": {
+          "type": "number",
+          "description": "Days between follow-up reminders"
+        },
+        "followUpDismissed": {
+          "type": "boolean",
+          "description": "Whether current follow-up alert has been dismissed"
+        },
+        "contacts": {
+          "type": "array",
+          "description": "Recruiter and interviewer contacts list"
+        },
+        "resumes": {
+          "type": "array",
+          "description": "Tailored resume versions attached to application"
+        },
+        "portfolioUrl": {
+          "type": "string",
+          "description": "Portfolio or project showcase URL",
+          "maxLength": 2048
+        },
+        "coverLetter": {
+          "type": "string",
+          "description": "Tailored cover letter text",
+          "maxLength": 10000
+        },
+        "notes": {
+          "type": "array",
+          "description": "Chronological interview and prep notes"
+        },
+        "priority": {
+          "type": "string",
+          "description": "Priority level",
+          "enum": ["low", "medium", "high", "dream_job"]
+        },
+        "rating": {
+          "type": "number",
+          "description": "Interest score from 1 to 5"
+        },
+        "calendarEventId": {
+          "type": "string",
+          "description": "Google Calendar event identifier",
+          "maxLength": 256
+        },
+        "calendarEventLink": {
+          "type": "string",
+          "description": "Direct Google Calendar web link",
+          "maxLength": 2048
+        },
+        "calendarSyncedAt": {
+          "type": "string",
+          "description": "Timestamp when synced with Google Calendar",
+          "maxLength": 64
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp",
+          "maxLength": 64
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update timestamp",
+          "maxLength": 64
+        }
+      },
+      "required": ["id", "userId", "title", "company", "category", "status", "appliedDate"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Private authenticated user profile record"
+    },
+    "/users/{userId}/jobs/{jobId}": {
+      "schema": "JobOpportunity",
+      "description": "Individual job opportunity tracking record scoped to the authenticated user"
+    }
+  }
+}

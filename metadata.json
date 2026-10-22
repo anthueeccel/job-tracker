@@ -1,0 +1,8 @@
+{
+  "name": "JobTracker Pro - Tech & Management Job Pipeline",
+  "description": "Smart spreadsheet replacement for JobsTech and JobsMgm with stage progress tracking (e.g. 0/3), Google Calendar integration, follow-up reminders, tailored resumes, and notes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

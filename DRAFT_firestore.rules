@@ -1,0 +1,112 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny all access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidUser(data, userId) {
+      return data.keys().hasAll(['id', 'email'])
+        && data.keys().hasOnly(['id', 'email', 'displayName', 'photoURL', 'createdAt'])
+        && data.id == userId
+        && data.id == request.auth.uid
+        && data.email is string
+        && data.email.size() <= 254
+        && (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 120))
+        && (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() <= 2048))
+        && (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 64));
+    }
+
+    function isValidJob(data, userId) {
+      return data.keys().hasAll(['id', 'userId', 'title', 'company', 'category', 'status', 'appliedDate'])
+        && data.keys().hasOnly([
+          'id', 'userId', 'title', 'company', 'category', 'status', 'statusDate',
+          'stages', 'location', 'workModel', 'jobUrl', 'salaryCurrency', 'salaryExpected',
+          'salaryOffered', 'benefits', 'appliedDate', 'lastActivityDate', 'nextFollowUpDate',
+          'followUpDaysInterval', 'followUpDismissed', 'contacts', 'resumes', 'portfolioUrl',
+          'coverLetter', 'notes', 'priority', 'rating', 'createdAt', 'updatedAt'
+        ])
+        && data.userId == userId
+        && data.userId == request.auth.uid
+        && data.id is string
+        && isValidId(data.id)
+        && data.title is string
+        && data.title.size() > 0
+        && data.title.size() <= 200
+        && data.company is string
+        && data.company.size() > 0
+        && data.company.size() <= 150
+        && data.category in ['JobsTech', 'JobsMgm', 'Other']
+        && data.status in ['applied', 'screening', 'interviewing', 'tech_challenge', 'offer', 'standby', 'rejected', 'withdrawn']
+        && data.appliedDate is string
+        && data.appliedDate.size() <= 32
+        && (!('statusDate' in data) || (data.statusDate is string && data.statusDate.size() <= 32))
+        && (!('location' in data) || (data.location is string && data.location.size() <= 150))
+        && (!('workModel' in data) || (data.workModel in ['remote', 'hybrid', 'onsite']))
+        && (!('jobUrl' in data) || (data.jobUrl is string && data.jobUrl.size() <= 2048))
+        && (!('portfolioUrl' in data) || (data.portfolioUrl is string && data.portfolioUrl.size() <= 2048))
+        && (!('coverLetter' in data) || (data.coverLetter is string && data.coverLetter.size() <= 10000))
+        && (!('salaryCurrency' in data) || (data.salaryCurrency is string && data.salaryCurrency.size() <= 10))
+        && (!('salaryExpected' in data) || (data.salaryExpected is string && data.salaryExpected.size() <= 100))
+        && (!('salaryOffered' in data) || (data.salaryOffered is string && data.salaryOffered.size() <= 100))
+        && (!('benefits' in data) || (data.benefits is string && data.benefits.size() <= 1000))
+        && (!('lastActivityDate' in data) || (data.lastActivityDate is string && data.lastActivityDate.size() <= 32))
+        && (!('nextFollowUpDate' in data) || (data.nextFollowUpDate is string && data.nextFollowUpDate.size() <= 32))
+        && (!('followUpDaysInterval' in data) || (data.followUpDaysInterval is number))
+        && (!('followUpDismissed' in data) || (data.followUpDismissed is bool))
+        && (!('priority' in data) || (data.priority in ['low', 'medium', 'high', 'dream_job']))
+        && (!('rating' in data) || (data.rating is number))
+        && (!('createdAt' in data) || (data.createdAt is string && data.createdAt.size() <= 64))
+        && (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 64))
+        && (!('stages' in data) || (data.stages is list && data.stages.size() <= 50))
+        && (!('contacts' in data) || (data.contacts is list && data.contacts.size() <= 30))
+        && (!('resumes' in data) || (data.resumes is list && data.resumes.size() <= 20))
+        && (!('notes' in data) || (data.notes is list && data.notes.size() <= 100));
+    }
+
+    // User profile documents
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && isValidId(userId) && isVerified() && isValidUser(incoming(), userId);
+      allow update: if isOwner(userId) && isValidId(userId) && isVerified() && isValidUser(incoming(), userId) && incoming().id == existing().id;
+      allow delete: if isOwner(userId) && isValidId(userId);
+
+      // Scoped user jobs collection
+      match /jobs/{jobId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(jobId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(jobId) && isVerified() && isValidJob(incoming(), userId) && incoming().id == jobId;
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(jobId) && isVerified() && isValidJob(incoming(), userId) && incoming().id == existing().id && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(jobId);
+      }
+    }
+  }
+}
