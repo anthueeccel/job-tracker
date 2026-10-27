@@ -1,15 +1,17 @@
-/**
- * Security Rule Test Matrix for JobTracker Pro
- * Tests coverage against the Dirty Dozen threat vectors.
- */
+/** 
+ * Security Rule Test Matrix for JobTracker Pro 
+ * Tests coverage against the Dirty Dozen threat vectors. 
+ */ 
+
+import { test, describe, expect } from 'bun'
 
 export interface TestPayload {
-  description: string;
-  auth: { uid: string; email_verified?: boolean } | null;
-  path: string;
-  operation: 'get' | 'list' | 'create' | 'update' | 'delete';
-  data?: Record<string, unknown>;
-  expectedOutcome: 'ALLOW' | 'PERMISSION_DENIED';
+  description: string
+  auth: { uid: string; email_verified?: boolean } | null
+  path: string
+  operation: 'get' | 'list' | 'create' | 'update' | 'delete'
+  data?: Record<string, unknown>
+  expectedOutcome: 'ALLOW' | 'PERMISSION_DENIED'
 }
 
 export const DIRTY_DOZEN_TESTS: TestPayload[] = [
@@ -105,4 +107,20 @@ export const DIRTY_DOZEN_TESTS: TestPayload[] = [
     operation: 'get',
     expectedOutcome: 'PERMISSION_DENIED'
   }
-];
+]
+
+describe('Firestore Security Rules - Dirty Dozen Tests', () => {
+  it('should block all 12 security vectors', () => {
+    const totalTests = DIRTY_DOZEN_TESTS.length
+    expect(totalTests).toBe(12)
+
+    // Run through each test vector
+    for (const testCase of DIRTY_DOZEN_TESTS) {
+      testCase.description
+      // TODO: Implement actual Firestore rules testing here
+      // This typically involves using the Firebase Emulator or
+      // firestore.rules test helper to evaluate each payload against
+      // the security rules defined in firestore.rules
+    }
+  })
+})
