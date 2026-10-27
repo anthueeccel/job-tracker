@@ -45,6 +45,11 @@ jobs:
           }
           EOF
 
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: ".bun-version"
+
       - name: Lint
         run: bun run lint
 

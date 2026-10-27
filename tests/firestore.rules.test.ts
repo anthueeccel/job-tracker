@@ -2,8 +2,7 @@
  * Security Rule Test Matrix for JobTracker Pro 
  * Tests coverage against the Dirty Dozen threat vectors. 
  */ 
-
-import { test, describe, expect } from 'bun'
+import { describe, it, expect, beforeAll } from 'vitest';
 
 export interface TestPayload {
   description: string
@@ -14,7 +13,7 @@ export interface TestPayload {
   expectedOutcome: 'ALLOW' | 'PERMISSION_DENIED'
 }
 
-export const DIRTY_DOZEN_TESTS: TestPayload[] = [
+export const DIRTY_DOZEN_TESTS: TestPayload[] = [  
   {
     description: 'Vector 1: Unauthenticated Read',
     auth: null,

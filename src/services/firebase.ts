@@ -23,7 +23,18 @@ import { JobOpportunity } from '../types/job';
 
 // Resolve Firebase configuration dynamically from environment variables (for git/deployment security)
 // or local applet configuration
-const resolvedFirebaseConfig = {
+// const resolvedFirebaseConfig = {
+//   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || (firebaseConfig as Record<string, string>)?.apiKey || '',
+//   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || (firebaseConfig as Record<string, string>)?.projectId || '',
+//   appId: import.meta.env.VITE_FIREBASE_APP_ID || (firebaseConfig as Record<string, string>)?.appId || '',
+//   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || (firebaseConfig as Record<string, string>)?.authDomain || '',
+//   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || (firebaseConfig as Record<string, string>)?.storageBucket || '',
+//   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || (firebaseConfig as Record<string, string>)?.messagingSenderId || '',
+//   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || (firebaseConfig as Record<string, string>)?.measurementId || '',
+//   oAuthClientId: import.meta.env.VITE_FIREBASE_OAUTH_CLIENT_ID || (firebaseConfig as Record<string, string>)?.oAuthClientId || '',
+//   recaptchaSiteKey: import.meta.env.VITE_FIREBASE_RECAPTCHA_SITE_KEY || (firebaseConfig as Record<string, string>)?.recaptchaSiteKey || ''
+// };
+export const resolvedFirebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || (firebaseConfig as Record<string, string>)?.apiKey || '',
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || (firebaseConfig as Record<string, string>)?.projectId || '',
   appId: import.meta.env.VITE_FIREBASE_APP_ID || (firebaseConfig as Record<string, string>)?.appId || '',
