@@ -1,18 +1,30 @@
 name: Deploy to Firebase Hosting
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Build and Test"]
+    types: [completed]
     branches: ["main", "master"]
-  workflow_dispatch: # can be manually ran from the Actions tab
+  workflow_dispatch: # manual run from the Actions tab
 
 concurrency:
   group: firebase-deploy
   cancel-in-progress: false
 
+permissions:
+  contents: read
+  checks: write
+
 jobs:
   deploy:
     name: Build & Deploy
     runs-on: ubuntu-latest
+
+    # Only deploy if tests passed
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push')
 
     env:
       VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
@@ -25,8 +37,10 @@ jobs:
       VITE_FIRESTORE_DATABASE_ID: ${{ secrets.VITE_FIRESTORE_DATABASE_ID }}
 
     steps:
-      - name: Checkout repository
+      - name: Checkout the exact commit that passed the tests
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
