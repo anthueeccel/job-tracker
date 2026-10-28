@@ -1,0 +1,20 @@
+{
+  "hosting": {
+    "public": "dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "firestore": {
+    "database": "ai-studio-jobtrackerprotec-67f49dda-dd89-4ce0-b19f-dec97a57a6af",
+    "rules": "firestore.rules"
+  }
+}
