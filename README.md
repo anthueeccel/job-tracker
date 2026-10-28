@@ -1,3 +1,5 @@
+[![TypeScript](https://badgen.net/badge/icon/typescript?icon=typescript&label)](https://typescriptlang.org) [![Build](https://github.com/anthueeccel/job-tracker/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/anthueeccel/job-tracker/actions/workflows/build-and-test.yml) [![Deploy](https://github.com/anthueeccel/job-tracker/actions/workflows/deploy.yml/badge.svg)](https://github.com/anthueeccel/job-tracker/actions/workflows/deploy.yml) ![last_commit](https://img.shields.io/github/last-commit/anthueeccel/job-tracker) ![license](https://img.shields.io/github/license/anthueeccel/job-tracker)
+
 # JobTracker Pro
 
 > **Smart Spreadsheet Replacement for Tech Engineering & Management Job Search Pipelines**
@@ -39,6 +41,7 @@ It features dedicated tracks for **JobsTech** (Software Engineering, Cloud, DevO
 Applying for jobs across multiple tracks often leads to chaotic spreadsheets where follow-up deadlines are missed, recruiter contact details are scattered across emails, and interview stage statuses become outdated.
 
 **JobTracker Pro solves this with:**
+
 - **Two First-Class Tracks**: Quickly toggle between `JobsTech` and `JobsMgm`, or inspect a consolidated `All Opportunities` view.
 - **Visual Interview Stage Progress (X/Y)**: Instantly track whether an application has completed 0/3, 1/3, 2/3, or 3/3 interview rounds (HR Screening, Technical Challenge, System Design, Leadership Interview, etc.).
 - **Follow-up Timing Engine**: Automatically flags applications needing outreach based on configurable reminder cadences (overdue, due today, or upcoming).
@@ -50,6 +53,7 @@ Applying for jobs across multiple tracks often leads to chaotic spreadsheets whe
 ## How to Use This App
 
 ### Adding an Opportunity
+
 1. Click the **+ New Opportunity** button (located on the far left of the top menu bar).
 2. Enter the essential details:
    - **Company Name** and **Position Title**.
@@ -63,34 +67,41 @@ Applying for jobs across multiple tracks often leads to chaotic spreadsheets whe
 4. Click **Create Opportunity**.
 
 ### Editing an Opportunity
+
 - **Quick Edit**: Click the **Edit (pencil icon)** button in the sticky **Actions** column on the far right of any row.
 - **Detailed Drawer**: Click anywhere on a job row to open the full slide-over drawer, where you can update interview stages, recruiter contacts, compensation offers, and notes.
 - Click **Save Changes** to commit updates.
 
 ### Creating & Managing Notes
+
 1. Open the job's detail drawer by clicking on the opportunity row.
 2. Scroll to the **Interview & Preparation Notes** section.
 3. Type your note in the text box (e.g. key interview questions asked, recruiter feedback, salary negotiation notes, preparation checklists).
 4. Click **Add Note**. Each note is time-stamped and preserved chronologically.
 
 ### Changing Status & Advancing Interview Stages
+
 - **From the List tab**: Click directly on the **Status** badge in column 3 to cycle through statuses, or use the quick status dropdown to update it immediately.
 - **From the Kanban board**: Switch to the **Kanban** tab in the top navigation to drag and drop application cards between stages (`Applied` ➔ `Screening` ➔ `Interviewing` ➔ `Tech Challenge` ➔ `Offer Received`).
 - **Quick Stage Advancement (0/3 ➔ 1/3 ➔ 2/3)**: In the **Stage Progress** column, click the fast-forward button or click individual stages to mark them as `Completed`, `Scheduled`, or `Passed`.
 
 ### Syncing Interviews with Google Calendar
+
 1. In the **Follow-up / Timing** column or inside the Job Drawer, click **Add to Calendar** or the calendar icon next to any interview stage.
 2. If signed in with Google, you can sync the interview event with direct 1-click Google Calendar integration.
 3. You can also click the direct Google Calendar web link to open the pre-filled event in Google Calendar with interview timing, meeting notes, and company title.
 
 ### View Modes
+
 JobTracker Pro includes 4 specialized views accessible via the top view switcher:
+
 1. **List View**: Enhanced high-density spreadsheet with sorting by Company, Stage Progress, Status, and Timing, complete with dual top and bottom horizontal scrollbars.
 2. **Kanban View**: Visual drag-and-drop board organized by application status.
 3. **Calendar View**: Chronological agenda and timeline of interview dates and upcoming outreach.
 4. **Analytics View**: Conversion rate funnels, stage distribution, and application performance metrics.
 
 ### Pagination & Horizontal Navigation
+
 - **Pagination**: Use the **Per page** toggle in the top or bottom toolbar to view **10** (default for maximum performance), **30**, **50**, or **All** items at once.
 - **Horizontal Scrollbars**: A synchronized horizontal scrollbar is available at **both the top and the bottom** of the list.
 - **Quick Navigation**: Use the **Start** and **End** buttons to jump instantly between the first column (Company) and the last column (Actions).
@@ -102,18 +113,21 @@ JobTracker Pro includes 4 specialized views accessible via the top view switcher
 Click the **Export / CSV** button in the top navigation bar to open the data management modal.
 
 ### Export to CSV (Spreadsheet)
+
 - Click **Download CSV Spreadsheet**.
 - Generates a UTF-8 compatible `.csv` file containing company names, positions, categories (`JobsTech`/`JobsMgm`), status, interview progress, timing dates, salary expectations, recruiter details, and notes.
 - Fully compatible with Microsoft Excel, Google Sheets, LibreOffice, and Apple Numbers.
 
 ### Export & Import JSON Backup
+
 - **Export Backup**: Click **Download Full JSON Backup** to export an exhaustive, structured JSON file with all relational stages, contacts, resumes, and timestamps.
-- **Import Backup**: 
+- **Import Backup**:
   1. Click **Choose File** in the Import section and select a valid `.json` backup file.
   2. Choose whether to **Merge with existing opportunities** or **Replace entire list**.
   3. Click **Import & Restore Data**.
 
 ### Using AI to Convert CSV/Spreadsheets to JSON
+
 If you have an existing job tracking spreadsheet (from Excel, Notion, or Google Sheets) in CSV format and want to import it into JobTracker Pro:
 
 1. Copy your CSV text or export a few rows.
@@ -158,6 +172,7 @@ Here is my spreadsheet data:
 4. Save the generated JSON to a file named `my_jobs.json` and upload it using the **Import JSON Backup** feature in JobTracker Pro.
 
 ### Browser Storage Scanner & Recovery
+
 JobTracker Pro includes a built-in browser memory scanner. If you previously saved records in your browser under previous version keys, click **Scan & Recover** inside the Export/Import modal to automatically restore and merge any detected legacy applications.
 
 ---
@@ -176,20 +191,23 @@ JobTracker Pro includes a built-in browser memory scanner. If you previously sav
 ## How to Run This App Locally
 
 ### Prerequisites
+
 - **Node.js**: Version 18.x or higher (or [Bun](https://bun.sh/))
 - **npm** (comes with Node.js) or **bun**
 - A modern web browser (Chrome, Edge, Firefox, or Safari)
 
 ### Forking & Downloading
+
 1. Fork the repository on GitHub by clicking the **Fork** button in the top right.
 2. Clone your fork to your local computer:
    ```bash
    git clone https://github.com/<your-username>/jobtracker-pro.git
    cd jobtracker-pro
    ```
-   *(Alternatively, click **Code ➔ Download ZIP** and extract the archive.)*
+   _(Alternatively, click **Code ➔ Download ZIP** and extract the archive.)_
 
 ### Environment Configuration
+
 1. Duplicate the example environment file:
    ```bash
    cp .env.example .env
@@ -203,10 +221,12 @@ JobTracker Pro includes a built-in browser memory scanner. If you previously sav
    VITE_FIREBASE_STORAGE_BUCKET="your-project-id.firebasestorage.app"
    VITE_FIREBASE_MESSAGING_SENDER_ID="your-messaging-sender-id"
    ```
-   *(Note: The app will run out of the box using local browser storage if Firebase environment variables are omitted.)*
+   _(Note: The app will run out of the box using local browser storage if Firebase environment variables are omitted.)_
 
 ### Installation & Running
+
 1. Install project dependencies:
+
    ```bash
    npm install
    # or with bun:
@@ -214,6 +234,7 @@ JobTracker Pro includes a built-in browser memory scanner. If you previously sav
    ```
 
 2. Start the local development server:
+
    ```bash
    npm run dev
    # or with bun:
@@ -221,6 +242,7 @@ JobTracker Pro includes a built-in browser memory scanner. If you previously sav
    ```
 
 3. Open your browser and navigate to:
+
    ```
    http://localhost:3000
    ```
@@ -230,6 +252,56 @@ JobTracker Pro includes a built-in browser memory scanner. If you previously sav
    npm run build
    ```
    The compiled assets will be placed in the `dist/` directory.
+
+---
+
+## Deployment
+
+Firebase Hosting is the easiest option for this Vite React app. It’s free for small apps, gives you HTTPS, and your project domain (yourproject.web.app) will be automatically added to the Firebase Authentication authorized sign-in domains.
+
+### Publish with Firebase Hosting
+
+1. **Install the Firebase CLI** (once):
+
+   ```bash
+   npm install -g firebase-tools
+   firebase login
+   ```
+
+2. **Initialize hosting** in your project folder:
+
+   ```bash
+   firebase init hosting
+   ```
+
+   Answer the prompts like this:
+   - **Project**: pick the one matching your `VITE_FIREBASE_PROJECT_ID`
+   - **Public directory**: `dist`
+   - **Single-page app (rewrite all URLs to /index.html)**: `Yes`
+   - **Set up automatic builds with GitHub**: `No for now`
+   - **Overwrite dist/index.html**: `No`
+
+3. **Build and deploy**:
+   ```bash
+   bun run build
+   firebase deploy --only hosting
+   ```
+   The CLI prints your live URL, for example `https://yourproject.web.app`. Sign-in should work there without changes. If it doesn’t, check that the domain appears in **Authentication → Settings → Authorized domains**.
+
+### Check before going public
+
+- **Firestore security rules**: Your app is now reachable by anyone, so the rules are what protect your data. Make sure users can only read and write `users/{their own uid}/...`, and deploy them with `firebase deploy --only firestore:rules`.
+- **Server-side code**: Your dependencies include `express`, `dotenv`, and `tsx`, but there is no server file in the project. Everything runs in the browser, so you’re fine with Firebase Hosting which serves static files only.
+
+### Auto-deploy from GitHub (optional)
+
+Once the manual deploy works, this sets up a workflow that deploys on every push to `main`:
+
+```bash
+firebase init hosting:github
+```
+
+It creates the service account and the GitHub secret for you. Then add your build step with the `VITE_*` secrets, as in your existing workflow.
 
 ---
 
