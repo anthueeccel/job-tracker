@@ -6,7 +6,7 @@ export const INITIAL_JOBS: JobOpportunity[] = [
   // JobsTech
   {
     id: 'tech-1',
-    title: 'Senior Fullstack Engineer (React / Node.js / Cloud)',
+    title: 'EXAMPLE Senior Fullstack Engineer (.NET / React / Microservices)',
     company: 'Cabify Tech',
     category: 'JobsTech',
     status: 'interviewing',
@@ -85,143 +85,11 @@ export const INITIAL_JOBS: JobOpportunity[] = [
     priority: 'dream_job',
     rating: 5
   },
-  {
-    id: 'tech-2',
-    title: 'Frontend Architect & Tech Lead',
-    company: 'Glovo / Delivery Hero',
-    category: 'JobsTech',
-    status: 'tech_challenge',
-    stages: [
-      {
-        id: 'stage-2-1',
-        name: 'Screening with Talent Partner',
-        completed: true,
-        date: '2026-10-12',
-        time: '14:00',
-        notes: 'Quick 30-min alignment on salary expectations, relocation, and remote setup.'
-      },
-      {
-        id: 'stage-2-2',
-        name: 'Take-Home Practical Challenge (48h)',
-        completed: false,
-        date: '2026-10-22',
-        time: '18:00',
-        notes: 'Build a real-time order tracking dashboard with WebSockets, optimistic UI, and test coverage.'
-      },
-      {
-        id: 'stage-2-3',
-        name: 'Technical Code Defense with Staff Engineers',
-        completed: false,
-        notes: 'Discussion of trade-offs, state management, and accessibility.'
-      },
-      {
-        id: 'stage-2-4',
-        name: 'Executive Leadership & Offer Discussion',
-        completed: false
-      }
-    ],
-    location: 'Barcelona, Spain',
-    workModel: 'hybrid',
-    jobUrl: 'https://jobs.glovoapp.com',
-    salaryCurrency: '€',
-    salaryExpected: '€75,000 - €85,000 / yr',
-    benefits: 'Gympass, 50% discount on Glovo Prime, 10% annual performance bonus',
-    appliedDate: '2026-10-08',
-    lastActivityDate: '2026-10-14',
-    nextFollowUpDate: '2026-10-21',
-    followUpDaysInterval: 7,
-    contacts: [
-      {
-        name: 'Jordi Torrent',
-        role: 'Lead Engineering Recruiter',
-        email: 'jordi.torrent@example-glovo.com',
-        phone: '+34 689 987 654',
-        linkedin: 'https://linkedin.com/in/jordi-torrent-recruiting'
-      }
-    ],
-    resumes: [
-      {
-        id: 'cv-2',
-        fileName: 'CV_Frontend_Architect_International.pdf',
-        fileSize: '210 KB',
-        fileType: 'application/pdf',
-        uploadedAt: '2026-10-08',
-        versionLabel: 'International English Version',
-        tailoredFocus: 'Core Web Vitals, enterprise Design Systems, and advanced TypeScript patterns.'
-      }
-    ],
-    notes: [
-      {
-        id: 'note-2-1',
-        createdAt: '2026-10-14T11:00:00Z',
-        type: 'general',
-        content: 'Take-home repository shared via GitHub Classroom. Deadline is October 22nd.'
-      }
-    ],
-    priority: 'high',
-    rating: 4
-  },
-  {
-    id: 'tech-3',
-    title: 'Senior Cloud & Backend Developer',
-    company: 'Amadeus IT Group',
-    category: 'JobsTech',
-    status: 'applied',
-    stages: [
-      {
-        id: 'stage-3-1',
-        name: 'ATS Resume Review',
-        completed: false,
-        date: '2026-10-23',
-        time: '11:00',
-        notes: 'Awaiting profile screening by the Global Talent Acquisition team.'
-      },
-      {
-        id: 'stage-3-2',
-        name: 'Technical Competency Interview',
-        completed: false
-      },
-      {
-        id: 'stage-3-3',
-        name: 'Panel with Engineering Director',
-        completed: false
-      }
-    ],
-    location: 'Madrid / Nice / Remote',
-    workModel: 'hybrid',
-    salaryCurrency: '€',
-    salaryExpected: '€68,000 / yr',
-    appliedDate: '2026-10-15',
-    lastActivityDate: '2026-10-15',
-    nextFollowUpDate: '2026-10-23',
-    followUpDaysInterval: 8,
-    contacts: [],
-    resumes: [
-      {
-        id: 'cv-3',
-        fileName: 'CV_Backend_Cloud_AWS.pdf',
-        fileSize: '190 KB',
-        fileType: 'application/pdf',
-        uploadedAt: '2026-10-15',
-        versionLabel: 'Distributed Systems & AWS Focus'
-      }
-    ],
-    notes: [
-      {
-        id: 'note-3-1',
-        createdAt: '2026-10-15T09:00:00Z',
-        type: 'research',
-        content: 'Major tech leader in aviation and travel. Deep usage of Kafka, Kubernetes, and Golang/Java.'
-      }
-    ],
-    priority: 'medium',
-    rating: 3
-  },
-
+  
   // JobsMgm
   {
     id: 'mgm-1',
-    title: 'Engineering Manager - Core Platform',
+    title: 'EXAMPLE Engineering Manager - Core Platform',
     company: 'Typeform',
     category: 'JobsMgm',
     status: 'interviewing',
@@ -298,121 +166,6 @@ export const INITIAL_JOBS: JobOpportunity[] = [
     ],
     priority: 'dream_job',
     rating: 5
-  },
-  {
-    id: 'mgm-2',
-    title: 'Senior Technical Product Manager',
-    company: 'ManoMano Tech',
-    category: 'JobsMgm',
-    status: 'screening',
-    stages: [
-      {
-        id: 'stage-m2-1',
-        name: 'Senior Recruiter Screening',
-        completed: true,
-        date: '2026-10-14',
-        time: '15:00',
-        notes: 'Validated past experience with B2B marketplace scaling, search algorithms, and high-volume data platforms.'
-      },
-      {
-        id: 'stage-m2-2',
-        name: 'Product Sense & Discovery Deep-Dive',
-        completed: false,
-        date: '2026-10-27',
-        time: '14:30',
-        notes: 'Conversion rate optimization, RICE framework, and technical roadmap discovery.'
-      },
-      {
-        id: 'stage-m2-3',
-        name: 'Cultural Alignment with Heads of Design & Business',
-        completed: false
-      }
-    ],
-    location: 'Barcelona, Spain',
-    workModel: 'hybrid',
-    salaryCurrency: '€',
-    salaryExpected: '€78,000 / yr',
-    appliedDate: '2026-10-10',
-    lastActivityDate: '2026-10-14',
-    nextFollowUpDate: '2026-10-21',
-    followUpDaysInterval: 7,
-    contacts: [
-      {
-        name: 'Matteo Rossi',
-        role: 'Talent Acquisition Partner',
-        email: 'matteo.rossi@example-manomano.com',
-        linkedin: 'https://linkedin.com/in/matteo-rossi-product-recruiter'
-      }
-    ],
-    resumes: [
-      {
-        id: 'cv-m2',
-        fileName: 'CV_Technical_Product_Manager_EN.pdf',
-        fileSize: '198 KB',
-        fileType: 'application/pdf',
-        uploadedAt: '2026-10-10',
-        versionLabel: 'Product Management & Business Analytics Focus'
-      }
-    ],
-    notes: [
-      {
-        id: 'note-m2-1',
-        createdAt: '2026-10-14T15:00:00Z',
-        type: 'question',
-        content: 'Ask in the next round about autonomy regarding French corporate OKRs versus local product squads.'
-      }
-    ],
-    priority: 'high',
-    rating: 4
-  },
-  {
-    id: 'mgm-3',
-    title: 'Scrum Master & Agile Delivery Lead',
-    company: 'Santander Digital / Tech',
-    category: 'JobsMgm',
-    status: 'applied',
-    stages: [
-      {
-        id: 'stage-m3-1',
-        name: 'Profile Screening & Certification Verification',
-        completed: false,
-        date: '2026-10-26',
-        time: '09:30',
-        notes: 'Verification of Agile leadership credentials and team scaling experience.'
-      },
-      {
-        id: 'stage-m3-2',
-        name: 'Interview with Agile Chapter Lead',
-        completed: false
-      },
-      {
-        id: 'stage-m3-3',
-        name: 'Cross-Squad Delivery Impediment Panel',
-        completed: false
-      }
-    ],
-    location: 'Madrid, Spain',
-    workModel: 'hybrid',
-    salaryCurrency: '€',
-    salaryExpected: '€62,000 - €70,000 / yr',
-    appliedDate: '2026-10-18',
-    lastActivityDate: '2026-10-18',
-    nextFollowUpDate: '2026-10-25',
-    followUpDaysInterval: 7,
-    contacts: [],
-    resumes: [
-      {
-        id: 'cv-m3',
-        fileName: 'CV_Agile_Coach_Delivery_Lead.pdf',
-        fileSize: '220 KB',
-        fileType: 'application/pdf',
-        uploadedAt: '2026-10-18',
-        versionLabel: 'Flow Metrics, Kanban, and Scrum Master Focus'
-      }
-    ],
-    notes: [],
-    priority: 'medium',
-    rating: 3
   }
 ];
 
@@ -572,9 +325,10 @@ export function findAndRecoverAllLocalJobs(): StorageRecoveryResult {
   };
 }
 
-export function getStoredJobs(): JobOpportunity[] {
+export function getStoredJobs(userId?: string): JobOpportunity[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const key = userId ? `${STORAGE_KEY}_${userId}` : STORAGE_KEY;
+    const raw = localStorage.getItem(key);
     let currentJobs: JobOpportunity[] = [];
     if (raw) {
       const parsed = JSON.parse(raw);
@@ -594,15 +348,17 @@ export function getStoredJobs(): JobOpportunity[] {
       }
     }
 
-    // Check if recovery finds more records across other keys or legacy storage!
-    const recovery = findAndRecoverAllLocalJobs();
-    if (recovery.totalFound > currentJobs.length) {
-      saveStoredJobs(recovery.recoveredJobs);
-      return recovery.recoveredJobs;
-    }
-
     if (currentJobs.length > 0) {
       return currentJobs;
+    }
+
+    // Check if recovery finds more records across other keys or legacy storage (only when no userId or for global default)
+    if (!userId) {
+      const recovery = findAndRecoverAllLocalJobs();
+      if (recovery.totalFound > currentJobs.length) {
+        saveStoredJobs(recovery.recoveredJobs);
+        return recovery.recoveredJobs;
+      }
     }
 
     // Default fallback to initial jobs
@@ -610,7 +366,7 @@ export function getStoredJobs(): JobOpportunity[] {
       ...j,
       statusDate: j.statusDate || j.lastActivityDate || j.appliedDate
     }));
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(withStatusDate));
+    localStorage.setItem(key, JSON.stringify(withStatusDate));
     return withStatusDate;
   } catch (err) {
     console.error('Error loading jobs from storage:', err);
@@ -618,9 +374,10 @@ export function getStoredJobs(): JobOpportunity[] {
   }
 }
 
-export function saveStoredJobs(jobs: JobOpportunity[]): void {
+export function saveStoredJobs(jobs: JobOpportunity[], userId?: string): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(jobs));
+    const key = userId ? `${STORAGE_KEY}_${userId}` : STORAGE_KEY;
+    localStorage.setItem(key, JSON.stringify(jobs));
   } catch (err) {
     console.error('Error saving jobs to storage:', err);
   }
