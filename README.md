@@ -1,4 +1,8 @@
-[![TypeScript](https://badgen.net/badge/icon/typescript?icon=typescript&label)](https://typescriptlang.org) [![Build](https://github.com/anthueeccel/job-tracker/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/anthueeccel/job-tracker/actions/workflows/build-and-test.yml) [![Deploy](https://github.com/anthueeccel/job-tracker/actions/workflows/deploy.yml/badge.svg)](https://github.com/anthueeccel/job-tracker/actions/workflows/deploy.yml) ![last_commit](https://img.shields.io/github/last-commit/anthueeccel/job-tracker) ![license](https://img.shields.io/github/license/anthueeccel/job-tracker)
+[![TypeScript](https://badgen.net/badge/icon/TypeScript?icon=typescript&label)](https://typescriptlang.org) 
+[![Build](https://github.com/anthueeccel/job-tracker/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/anthueeccel/job-tracker/actions/workflows/build-and-test.yml) 
+[![Deploy](https://github.com/anthueeccel/job-tracker/actions/workflows/deploy.yml/badge.svg)](https://github.com/anthueeccel/job-tracker/actions/workflows/deploy.yml) 
+![Last_Commit](https://img.shields.io/github/last-commit/anthueeccel/job-tracker) 
+[![license](http://img.shields.io/:license-MIT-yellow.svg?style=flat-square)](http://badges.mit-license.org)
 
 # JobTracker Pro
 
