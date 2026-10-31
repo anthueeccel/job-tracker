@@ -1,32 +1,27 @@
-import React, { useState, useEffect } from "react";
-import { JobOpportunity, JobCategory, JobStatus, StageItem } from "./types/job";
-import {
-  getStoredJobs,
-  saveStoredJobs,
-  calculateFollowUps,
-  INITIAL_JOBS,
-} from "./services/storage";
-import { Header, ViewMode } from "./components/Header";
-import { JobTable } from "./components/JobTable";
-import { JobKanban } from "./components/JobKanban";
-import { JobCalendar } from "./components/JobCalendar";
-import { JobAnalytics } from "./components/JobAnalytics";
-import { JobModal } from "./components/JobModal";
-import { JobDetailDrawer } from "./components/JobDetailDrawer";
-import { FollowUpReminderModal } from "./components/FollowUpReminderModal";
-import { ExportImportModal } from "./components/ExportImportModal";
-import { ConfirmDeleteModal } from "./components/ConfirmDeleteModal";
-import { GoogleCalendarSyncModal } from "./components/GoogleCalendarSyncModal";
-import { LoginPage } from "./components/LoginPage";
-import { useAuth } from "./context/AuthContext";
+import React, { useState, useEffect, useMemo } from 'react';
+import { JobOpportunity, JobCategory, JobStatus, StageItem } from './types/job';
+import { getStoredJobs, saveStoredJobs, calculateFollowUps, INITIAL_JOBS } from './services/storage';
+import { Header, ViewMode } from './components/Header';
+import { JobTable } from './components/JobTable';
+import { JobKanban } from './components/JobKanban';
+import { JobCalendar } from './components/JobCalendar';
+import { JobAnalytics } from './components/JobAnalytics';
+import { JobModal } from './components/JobModal';
+import { JobDetailDrawer } from './components/JobDetailDrawer';
+import { FollowUpReminderModal } from './components/FollowUpReminderModal';
+import { ExportImportModal } from './components/ExportImportModal';
+import { ConfirmDeleteModal } from './components/ConfirmDeleteModal';
+import { GoogleCalendarSyncModal } from './components/GoogleCalendarSyncModal';
+import { LoginPage } from './components/LoginPage';
+import { useAuth } from './context/AuthContext';
 import {
   saveJobToFirestore,
   deleteJobFromFirestore,
   subscribeToUserJobs,
-  batchSaveJobsToFirestore,
-} from "./services/firebase";
-import confetti from "canvas-confetti";
-import { ArrowRight, Loader2 } from "lucide-react";
+  batchSaveJobsToFirestore
+} from './services/firebase';
+import confetti from 'canvas-confetti';
+import { ArrowRight, Loader2 } from 'lucide-react';
 
 export default function App() {
   const [jobs, setJobs] = useState<JobOpportunity[]>([]);
@@ -34,12 +29,29 @@ export default function App() {
   const { user, loading: authLoading } = useAuth();
 
   // Filters & Views
-  const [currentCategory, setCurrentCategory] = useState<JobCategory | "All">(
-    "JobsTech",
-  );
-  const [viewMode, setViewMode] = useState<ViewMode>("table");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [currentCategory, setCurrentCategory] = useState<JobCategory | 'All'>('JobsTech');
+  const [viewMode, setViewMode] = useState<ViewMode>('table');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+
+  // Toggle to show / hide rejected opportunities (persisted in localStorage)
+  const [showRejected, setShowRejected] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem('jobtracker_show_rejected');
+      return saved !== null ? saved === 'true' : false;
+    } catch (e) {
+      return false;
+    }
+  });
+
+  const handleToggleShowRejected = (val: boolean) => {
+    setShowRejected(val);
+    try {
+      localStorage.setItem('jobtracker_show_rejected', String(val));
+    } catch (e) {
+      // ignore
+    }
+  };
 
   // Modals & Drawers
   const [isJobModalOpen, setIsJobModalOpen] = useState(false);
@@ -50,10 +62,8 @@ export default function App() {
   const [jobToDelete, setJobToDelete] = useState<JobOpportunity | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
-  const [calendarModalJob, setCalendarModalJob] =
-    useState<JobOpportunity | null>(null);
-  const [calendarModalStage, setCalendarModalStage] =
-    useState<StageItem | null>(null);
+  const [calendarModalJob, setCalendarModalJob] = useState<JobOpportunity | null>(null);
+  const [calendarModalStage, setCalendarModalStage] = useState<StageItem | null>(null);
 
   // Load jobs based on Firebase Auth state
   useEffect(() => {
@@ -69,9 +79,7 @@ export default function App() {
     // Guaranteed unblock: Safety timeout ensures UI is NEVER stuck on loading spinner
     const safetyTimer = setTimeout(() => {
       if (isMounted) {
-        console.warn(
-          "Firestore subscription pending; unblocking UI with cached local state.",
-        );
+        console.warn('Firestore subscription pending; unblocking UI with cached local state.');
         const cached = getStoredJobs(user.uid);
         setJobs((prev) => (prev.length > 0 ? prev : cached));
         setIsLoaded(true);
@@ -91,10 +99,10 @@ export default function App() {
           const hasSeeded = localStorage.getItem(userSeedKey);
 
           if (!hasSeeded) {
-            localStorage.setItem(userSeedKey, "true");
+            localStorage.setItem(userSeedKey, 'true');
             const initialSeed = INITIAL_JOBS.map((j) => ({
               ...j,
-              userId: user.uid,
+              userId: user.uid
             }));
             setJobs(initialSeed);
             saveStoredJobs(initialSeed, user.uid);
@@ -104,10 +112,7 @@ export default function App() {
             try {
               await batchSaveJobsToFirestore(user.uid, initialSeed);
             } catch (err) {
-              console.warn(
-                "Background seed to Firestore completed with fallback:",
-                err,
-              );
+              console.warn('Background seed to Firestore completed with fallback:', err);
             }
           } else {
             // User intentionally cleared or has 0 jobs
@@ -124,12 +129,12 @@ export default function App() {
       },
       (err) => {
         clearTimeout(safetyTimer);
-        console.warn("Firestore subscription error (using local cache):", err);
+        console.warn('Firestore subscription error (using local cache):', err);
         if (isMounted) {
           setJobs(getStoredJobs(user.uid));
           setIsLoaded(true);
         }
-      },
+      }
     );
 
     return () => {
@@ -147,7 +152,7 @@ export default function App() {
       try {
         await batchSaveJobsToFirestore(user.uid, newJobs);
       } catch (err) {
-        console.error("Failed to sync batch jobs to Firestore:", err);
+        console.error('Failed to sync batch jobs to Firestore:', err);
       }
     } else {
       saveStoredJobs(newJobs);
@@ -169,7 +174,7 @@ export default function App() {
       try {
         await saveJobToFirestore(user.uid, jobToSave);
       } catch (err) {
-        console.error("Failed to sync job to Firestore:", err);
+        console.error('Failed to sync job to Firestore:', err);
       }
     }
 
@@ -199,7 +204,7 @@ export default function App() {
       try {
         await deleteJobFromFirestore(user.uid, id);
       } catch (err) {
-        console.error("Failed to delete job from Firestore:", err);
+        console.error('Failed to delete job from Firestore:', err);
       }
     }
 
@@ -212,7 +217,7 @@ export default function App() {
 
   // Quick update status
   const handleUpdateStatus = async (id: string, newStatus: JobStatus) => {
-    const todayStr = new Date().toISOString().split("T")[0];
+    const todayStr = new Date().toISOString().split('T')[0];
     let updatedJobTarget: JobOpportunity | null = null;
 
     const updated = jobs.map((j) => {
@@ -221,7 +226,7 @@ export default function App() {
           ...j,
           status: newStatus,
           statusDate: todayStr,
-          lastActivityDate: todayStr,
+          lastActivityDate: todayStr
         };
         updatedJobTarget = uj;
         return uj;
@@ -234,7 +239,7 @@ export default function App() {
       try {
         await saveJobToFirestore(user.uid, updatedJobTarget);
       } catch (err) {
-        console.error("Failed to update job status in Firestore:", err);
+        console.error('Failed to update job status in Firestore:', err);
       }
     }
 
@@ -252,7 +257,7 @@ export default function App() {
     updatedStages[nextIncompleteIdx] = {
       ...updatedStages[nextIncompleteIdx],
       completed: true,
-      date: new Date().toISOString().split("T")[0],
+      date: new Date().toISOString().split('T')[0]
     };
 
     const isAllDone = updatedStages.every((s) => s.completed);
@@ -265,23 +270,38 @@ export default function App() {
     const updatedJob: JobOpportunity = {
       ...job,
       stages: updatedStages,
-      lastActivityDate: new Date().toISOString().split("T")[0],
+      lastActivityDate: new Date().toISOString().split('T')[0]
     };
 
     await handleAddOrUpdateJob(updatedJob);
   };
 
+  // Count rejected opportunities for currently selected category
+  const rejectedCount = useMemo(() => {
+    return jobs.filter((job) => {
+      if (currentCategory !== 'All' && job.category !== currentCategory) {
+        return false;
+      }
+      return job.status === 'rejected';
+    }).length;
+  }, [jobs, currentCategory]);
+
   // Filtering
   const filteredJobs = jobs.filter((job) => {
     // 1. Category Filter
-    if (currentCategory !== "All" && job.category !== currentCategory) {
+    if (currentCategory !== 'All' && job.category !== currentCategory) {
       return false;
     }
 
     // 2. Status Filter
-    if (statusFilter === "active") {
-      if (job.status === "rejected" || job.status === "withdrawn") return false;
-    } else if (statusFilter !== "all" && job.status !== statusFilter) {
+    if (statusFilter === 'active') {
+      if (job.status === 'rejected' || job.status === 'withdrawn') return false;
+    } else if (statusFilter !== 'all' && job.status !== statusFilter) {
+      return false;
+    }
+
+    // 2.1 Switch Toggle: Show / Hide Rejected opportunities (unless user explicitly filtered by 'rejected')
+    if (!showRejected && job.status === 'rejected' && statusFilter !== 'rejected') {
       return false;
     }
 
@@ -292,22 +312,12 @@ export default function App() {
       const matchTitle = job.title.toLowerCase().includes(q);
       const matchLocation = job.location?.toLowerCase().includes(q) || false;
       const matchContact = job.contacts.some(
-        (c) =>
-          c.name.toLowerCase().includes(q) ||
-          c.email?.toLowerCase().includes(q),
+        (c) => c.name.toLowerCase().includes(q) || c.email?.toLowerCase().includes(q)
       );
       const matchResume = job.resumes.some(
-        (r) =>
-          r.fileName.toLowerCase().includes(q) ||
-          r.versionLabel?.toLowerCase().includes(q),
+        (r) => r.fileName.toLowerCase().includes(q) || r.versionLabel?.toLowerCase().includes(q)
       );
-      return (
-        matchCompany ||
-        matchTitle ||
-        matchLocation ||
-        matchContact ||
-        matchResume
-      );
+      return matchCompany || matchTitle || matchLocation || matchContact || matchResume;
     }
 
     return true;
@@ -321,9 +331,7 @@ export default function App() {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center gap-3 text-slate-400">
         <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
-        <span className="text-sm font-medium">
-          Connecting to JobTracker Pro...
-        </span>
+        <span className="text-sm font-medium">Connecting to JobTracker Pro...</span>
       </div>
     );
   }
@@ -337,9 +345,7 @@ export default function App() {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center gap-3 text-slate-400">
         <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
-        <span className="text-sm font-medium">
-          Loading your interview pipelines...
-        </span>
+        <span className="text-sm font-medium">Loading your interview pipelines...</span>
       </div>
     );
   }
@@ -381,9 +387,8 @@ export default function App() {
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
               </span>
               <span>
-                You have <strong>{urgentFollowUps.length}</strong> follow-up(s)
-                requiring outreach today (e.g., {urgentFollowUps[0].job.company}
-                )!
+                You have <strong>{urgentFollowUps.length}</strong> follow-up(s) requiring outreach today (e.g.,{' '}
+                {urgentFollowUps[0].job.company})!
               </span>
             </div>
             <button
@@ -403,24 +408,23 @@ export default function App() {
         <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
           <div className="flex items-center gap-2">
             <h2 className="text-base font-bold text-white flex items-center gap-2">
-              {currentCategory === "JobsTech" &&
-                "Tech Engineering & Architecture Pipeline"}
-              {currentCategory === "JobsMgm" &&
-                "Management, Product & Agile Leadership Pipeline"}
-              {currentCategory === "All" &&
-                "Consolidated Overview of All Opportunities"}
+              {currentCategory === 'JobsTech' && 'Tech Engineering & Architecture Pipeline'}
+              {currentCategory === 'JobsMgm' && 'Management, Product & Agile Leadership Pipeline'}
+              {currentCategory === 'All' && 'Consolidated Overview of All Opportunities'}
             </h2>
             <span className="text-xs text-slate-400 font-mono">
-              ({filteredJobs.length}{" "}
-              {filteredJobs.length === 1 ? "opportunity" : "opportunities"})
+              ({filteredJobs.length} {filteredJobs.length === 1 ? 'opportunity' : 'opportunities'})
             </span>
           </div>
         </div>
 
         {/* View Render */}
-        {viewMode === "table" && (
+        {viewMode === 'table' && (
           <JobTable
             jobs={filteredJobs}
+            showRejected={showRejected}
+            onToggleShowRejected={handleToggleShowRejected}
+            rejectedCount={rejectedCount}
             onSelectJob={(job) => setDrawerJob(job)}
             onEditJob={(job) => {
               setEditingJob(job);
@@ -435,9 +439,12 @@ export default function App() {
           />
         )}
 
-        {viewMode === "kanban" && (
+        {viewMode === 'kanban' && (
           <JobKanban
             jobs={filteredJobs}
+            showRejected={showRejected}
+            onToggleShowRejected={handleToggleShowRejected}
+            rejectedCount={rejectedCount}
             onSelectJob={(job) => setDrawerJob(job)}
             onUpdateStatus={handleUpdateStatus}
             onQuickAdvanceStage={handleQuickAdvanceStage}
@@ -447,7 +454,7 @@ export default function App() {
           />
         )}
 
-        {viewMode === "calendar" && (
+        {viewMode === 'calendar' && (
           <JobCalendar
             jobs={filteredJobs}
             onSelectJob={(job) => setDrawerJob(job)}
@@ -459,15 +466,16 @@ export default function App() {
           />
         )}
 
-        {viewMode === "analytics" && <JobAnalytics jobs={filteredJobs} />}
+        {viewMode === 'analytics' && (
+          <JobAnalytics jobs={filteredJobs} />
+        )}
       </main>
 
       {/* Footer */}
       <footer className="border-t border-slate-800/60 bg-slate-950/90 py-4 text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <strong>JobTracker Pro</strong> • Modern Spreadsheet Replacement for
-            JobsTech & JobsMgm
+            <strong>JobTracker Pro</strong> • Modern Spreadsheet Replacement for JobsTech & JobsMgm
           </div>
           <div className="flex items-center gap-4">
             <span>Stage Tracking (0/3)</span>
@@ -506,9 +514,7 @@ export default function App() {
           }}
           onSave={handleAddOrUpdateJob}
           initialJob={editingJob}
-          defaultCategory={
-            currentCategory === "All" ? "JobsTech" : currentCategory
-          }
+          defaultCategory={currentCategory === 'All' ? 'JobsTech' : currentCategory}
         />
       )}
 

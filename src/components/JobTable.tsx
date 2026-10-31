@@ -102,6 +102,9 @@ interface JobTableProps {
   onUpdateStatus: (id: string, newStatus: JobStatus) => void;
   onQuickAdvanceStage: (job: JobOpportunity) => void;
   onOpenFollowUpForJob: (job: JobOpportunity) => void;
+  showRejected?: boolean;
+  onToggleShowRejected?: (show: boolean) => void;
+  rejectedCount?: number;
 }
 
 export const JobTable: React.FC<JobTableProps> = ({
@@ -111,7 +114,10 @@ export const JobTable: React.FC<JobTableProps> = ({
   onDeleteJob,
   onUpdateStatus,
   onQuickAdvanceStage,
-  onOpenFollowUpForJob
+  onOpenFollowUpForJob,
+  showRejected = true,
+  onToggleShowRejected,
+  rejectedCount
 }) => {
   const [sortKey, setSortKey] = useState<JobSortKey | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
@@ -500,8 +506,19 @@ export const JobTable: React.FC<JobTableProps> = ({
         </div>
         <h3 className="text-lg font-bold text-white mb-2">No opportunities found</h3>
         <p className="text-sm text-slate-400 mb-6">
-          There are no job applications matching your selected filters. Create a new opportunity or clear your search to get started.
+          {rejectedCount && rejectedCount > 0 && !showRejected
+            ? `There are ${rejectedCount} rejected opportunities currently hidden.`
+            : 'There are no job applications matching your selected filters. Create a new opportunity or clear your search to get started.'}
         </p>
+        {rejectedCount && rejectedCount > 0 && !showRejected && onToggleShowRejected && (
+          <button
+            type="button"
+            onClick={() => onToggleShowRejected(true)}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-md transition-colors cursor-pointer"
+          >
+            <span>Show {rejectedCount} Rejected Opportunities</span>
+          </button>
+        )}
       </div>
     );
   }
@@ -750,6 +767,52 @@ export const JobTable: React.FC<JobTableProps> = ({
       {/* Top Table Navigation & Pagination Header */}
       <div className="px-4 py-2 bg-slate-950/90 border-b border-slate-800/80 flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2.5 text-slate-400 flex-wrap">
+          {/* Switch button: Show / Hide Rejected opportunities (placed to the left of List View) */}
+          {onToggleShowRejected && (
+            <>
+              <div className="flex items-center gap-2 mr-1">
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={showRejected}
+                  onClick={() => onToggleShowRejected(!showRejected)}
+                  className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-1 focus:ring-indigo-400 ${
+                    showRejected ? 'bg-indigo-600' : 'bg-slate-800'
+                  }`}
+                  title={showRejected ? 'Hide rejected opportunities' : 'Show rejected opportunities'}
+                >
+                  <span
+                    aria-hidden="true"
+                    className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                      showRejected ? 'translate-x-4' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onToggleShowRejected(!showRejected)}
+                  className="text-xs font-medium text-slate-300 hover:text-white transition-colors flex items-center gap-1.5 cursor-pointer select-none"
+                  title={showRejected ? 'Hide rejected opportunities' : 'Show rejected opportunities'}
+                >
+                  <span>Show Rejected</span>
+                  {typeof rejectedCount === 'number' && (
+                    <span
+                      className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono transition-colors ${
+                        showRejected
+                          ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                          : 'bg-slate-800 text-slate-500 border border-slate-700'
+                      }`}
+                    >
+                      {rejectedCount}
+                    </span>
+                  )}
+                </button>
+              </div>
+
+              <span className="text-slate-600">•</span>
+            </>
+          )}
+
           <div className="flex items-center gap-1.5 font-semibold text-slate-300">
             <ArrowRightLeft className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
             <span>List View</span>
