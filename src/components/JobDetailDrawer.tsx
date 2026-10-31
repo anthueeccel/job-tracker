@@ -13,7 +13,6 @@ import {
   MessageTemplate,
   TemplateLanguage
 } from '../services/templates';
-import { INTERVIEW_QUESTIONS_TECH, INTERVIEW_QUESTIONS_MGM } from '../services/interviewPrep';
 import { createGoogleCalendarUrl, downloadIcsFile } from '../services/calendar';
 import { formatStatusDateInfo } from '../services/timing';
 import { useAuth } from '../context/AuthContext';
@@ -40,9 +39,7 @@ import {
   Copy,
   Check,
   Sparkles,
-  Award,
   Download,
-  BookOpen,
   MapPin,
   CalendarPlus,
   Loader2
@@ -58,7 +55,7 @@ interface JobDetailDrawerProps {
   onOpenGoogleCalendarModal?: (job?: JobOpportunity, stage?: StageItem) => void;
 }
 
-type TabKey = 'stages' | 'notes' | 'contacts' | 'resumes' | 'interview_prep';
+type TabKey = 'stages' | 'notes' | 'contacts' | 'resumes';
 
 export const JobDetailDrawer: React.FC<JobDetailDrawerProps> = ({
   job,
@@ -339,7 +336,6 @@ export const JobDetailDrawer: React.FC<JobDetailDrawerProps> = ({
   };
 
   const statusConfig = STATUS_CONFIG[job.status] || STATUS_CONFIG.applied;
-  const questionsList = job.category === 'JobsMgm' ? INTERVIEW_QUESTIONS_MGM : INTERVIEW_QUESTIONS_TECH;
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/70 backdrop-blur-sm animate-fade-in">
@@ -347,12 +343,8 @@ export const JobDetailDrawer: React.FC<JobDetailDrawerProps> = ({
         {/* Top Header */}
         <div className="p-5 border-b border-slate-800 bg-slate-950/80 shrink-0">
           <div className="flex items-start justify-between gap-4 mb-3">
-            <div className="flex items-start gap-3 min-w-0">
-              <div className="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-base text-white shrink-0 shadow-sm">
-                {job.company.substring(0, 2).toUpperCase()}
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
                   <h2 className="text-lg font-bold text-white truncate">
                     {job.company}
                   </h2>
@@ -392,7 +384,6 @@ export const JobDetailDrawer: React.FC<JobDetailDrawerProps> = ({
                   )}
                 </div>
               </div>
-            </div>
 
             <div className="flex items-center gap-1.5 shrink-0">
               <button
@@ -513,18 +504,6 @@ export const JobDetailDrawer: React.FC<JobDetailDrawerProps> = ({
           >
             <FileText className="w-3.5 h-3.5" />
             <span>Tailored Resume</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('interview_prep')}
-            className={`py-3 px-3 font-medium border-b-2 transition-colors flex items-center gap-1.5 ${
-              activeTab === 'interview_prep'
-                ? 'border-indigo-500 text-indigo-400 font-bold'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>Interview Prep</span>
           </button>
         </div>
 
@@ -1188,37 +1167,6 @@ export const JobDetailDrawer: React.FC<JobDetailDrawerProps> = ({
                   ))}
                 </div>
               )}
-            </div>
-          )}
-
-          {/* TAB 5: INTERVIEW PREP GUIDE */}
-          {activeTab === 'interview_prep' && (
-            <div className="space-y-4">
-              <div className="p-4 rounded-xl bg-slate-950/80 border border-indigo-500/30">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-indigo-400 mb-1 flex items-center gap-1.5">
-                  <Award className="w-4 h-4" />
-                  Strategic Interview Guide
-                </h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Key technical and managerial questions to review before meeting the {job.company} interview team.
-                </p>
-              </div>
-
-              {questionsList.map((group, idx) => (
-                <div key={idx} className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 space-y-2.5">
-                  <h4 className="text-xs font-bold text-slate-200">
-                    {group.category}
-                  </h4>
-                  <ul className="space-y-2">
-                    {group.items.map((item, i) => (
-                      <li key={i} className="text-xs text-slate-300 flex items-start gap-2">
-                        <span className="text-indigo-400 font-bold">•</span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
             </div>
           )}
         </div>

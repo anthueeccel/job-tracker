@@ -1,8 +1,13 @@
-import React, { useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { JobOpportunity, JobStatus } from '../types/job';
 import { StageBadge } from './StageBadge';
-import { getJobTimingInfo, formatStatusDateInfo } from '../services/timing';
-import { FileText, Mail, Calendar, Clock, StickyNote, Kanban } from 'lucide-react';
+import {
+  getJobTimingInfo,
+  formatStatusDateInfo,
+  getLastRecordChangeInfo,
+  compareLastRecordChange
+} from '../services/timing';
+import { FileText, Mail, Calendar, Clock, StickyNote, Kanban, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface JobKanbanProps {
@@ -41,6 +46,8 @@ export const JobKanban: React.FC<JobKanbanProps> = ({
   onToggleShowRejected,
   rejectedCount
 }) => {
+  const [dateSortDirection, setDateSortDirection] = useState<'desc' | 'asc'>('desc');
+
   const columns = useMemo(() => {
     return showRejected ? [...BASE_KANBAN_COLUMNS, REJECTED_COLUMN] : BASE_KANBAN_COLUMNS;
   }, [showRejected]);
@@ -66,6 +73,32 @@ export const JobKanban: React.FC<JobKanbanProps> = ({
       {onToggleShowRejected && (
         <div className="px-4 py-2 bg-slate-950/90 border border-slate-800/80 rounded-xl flex flex-wrap items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-2.5 text-slate-400 flex-wrap">
+            {/* Button: Date Order with up and down arrows (placed to the left of Show Rejected switch button) */}
+            <button
+              type="button"
+              onClick={() => setDateSortDirection((prev) => (prev === 'desc' ? 'asc' : 'desc'))}
+              className="px-2.5 py-1 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer bg-indigo-600 hover:bg-indigo-500 text-white border-indigo-400 shadow-sm"
+              title={`Order cards by last changed date in the record (${dateSortDirection === 'desc' ? 'Newest first' : 'Oldest first'}). Click to toggle order.`}
+            >
+              <ArrowUpDown className="w-3.5 h-3.5 text-indigo-300 shrink-0" />
+              <span>Date Order</span>
+              <span className="flex items-center text-[10px] font-mono px-1 py-0.2 rounded bg-black/30 border border-white/10">
+                {dateSortDirection === 'desc' ? (
+                  <>
+                    <span>Newest</span>
+                    <ArrowDown className="w-2.5 h-2.5 ml-0.5 text-indigo-200" />
+                  </>
+                ) : (
+                  <>
+                    <span>Oldest</span>
+                    <ArrowUp className="w-2.5 h-2.5 ml-0.5 text-amber-200" />
+                  </>
+                )}
+              </span>
+            </button>
+
+            <span className="text-slate-600">•</span>
+
             {/* Switch button: Show / Hide Rejected opportunities */}
             <div className="flex items-center gap-2 mr-1">
               <button
@@ -124,7 +157,9 @@ export const JobKanban: React.FC<JobKanbanProps> = ({
 
       <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 ${columns.length > 6 ? 'xl:grid-cols-7' : 'xl:grid-cols-6'} gap-4 pb-6 overflow-x-auto`}>
         {columns.map((col) => {
-        const columnJobs = jobs.filter((j) => j.status === col.status);
+        const columnJobs = jobs
+          .filter((j) => j.status === col.status)
+          .sort((a, b) => compareLastRecordChange(a, b, dateSortDirection));
 
         return (
           <div
@@ -232,6 +267,21 @@ export const JobKanban: React.FC<JobKanbanProps> = ({
                             )}
                             <span className="font-semibold truncate">{timing.primaryText}</span>
                             <span className="opacity-75 truncate">• {timing.subText}</span>
+                          </div>
+                        );
+                      })()}
+
+                      {/* Last Record Change indicator */}
+                      {(() => {
+                        const changeInfo = getLastRecordChangeInfo(job);
+                        return (
+                          <div
+                            className="flex items-center gap-1.5 text-[10px] font-mono text-slate-400 mb-2 px-1"
+                            title={`Last change: ${changeInfo.formattedDate} (${changeInfo.relative}) via ${changeInfo.sourceLabel}: "${changeInfo.description}"`}
+                          >
+                            <span className="text-slate-500 font-sans">Changed:</span>
+                            <span className="text-indigo-300 font-semibold">{changeInfo.formattedDate}</span>
+                            <span className="text-slate-500 font-sans">({changeInfo.sourceLabel})</span>
                           </div>
                         );
                       })()}

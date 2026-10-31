@@ -54,7 +54,7 @@ export const JobModal: React.FC<JobModalProps> = ({
   const [company, setCompany] = useState('');
   const [category, setCategory] = useState<JobCategory>(defaultCategory);
   const [status, setStatus] = useState<JobStatus>('applied');
-  const [location, setLocation] = useState('Remote / US or Europe');
+  const [location, setLocation] = useState('');
   const [workModel, setWorkModel] = useState<'remote' | 'hybrid' | 'onsite'>('remote');
   const [jobUrl, setJobUrl] = useState('');
   const [salaryCurrency, setSalaryCurrency] = useState('$');
@@ -62,8 +62,12 @@ export const JobModal: React.FC<JobModalProps> = ({
   const [salaryOffered, setSalaryOffered] = useState('');
   const [benefits, setBenefits] = useState('');
   const [appliedDate, setAppliedDate] = useState(new Date().toISOString().split('T')[0]);
-  const [nextFollowUpDate, setNextFollowUpDate] = useState('');
-  const [followUpDaysInterval, setFollowUpDaysInterval] = useState(7);
+  const [nextFollowUpDate, setNextFollowUpDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 21);
+    return d.toISOString().split('T')[0];
+  });
+  const [followUpDaysInterval, setFollowUpDaysInterval] = useState(21);
   const [priority, setPriority] = useState<'low' | 'medium' | 'high' | 'dream_job'>('high');
 
   // Stages (2nd column control)
@@ -133,7 +137,7 @@ export const JobModal: React.FC<JobModalProps> = ({
       setBenefits(initialJob.benefits || '');
       setAppliedDate(initialJob.appliedDate || new Date().toISOString().split('T')[0]);
       setNextFollowUpDate(initialJob.nextFollowUpDate || '');
-      setFollowUpDaysInterval(initialJob.followUpDaysInterval || 7);
+      setFollowUpDaysInterval(initialJob.followUpDaysInterval || 21);
       setPriority(initialJob.priority || 'high');
       setStages(initialJob.stages || []);
       setModalNotes(initialJob.notes ? [...initialJob.notes] : []);
@@ -172,21 +176,21 @@ export const JobModal: React.FC<JobModalProps> = ({
       setCompany('');
       setCategory(defaultCategory);
       setStatus('applied');
-      setLocation('Remote / US or Europe');
+      setLocation('');
       setWorkModel('remote');
       setJobUrl('');
       setSalaryCurrency(defaultCategory === 'JobsTech' ? '$' : '€');
-      setSalaryExpected(defaultCategory === 'JobsTech' ? '$140,000 - $160,000 / yr' : '€85,000 / yr');
+      setSalaryExpected('');
       setSalaryOffered('');
       setModalNotes([]);
       setBenefits('');
       const todayStr = new Date().toISOString().split('T')[0];
       setAppliedDate(todayStr);
 
-      const d7 = new Date();
-      d7.setDate(d7.getDate() + 7);
-      setNextFollowUpDate(d7.toISOString().split('T')[0]);
-      setFollowUpDaysInterval(7);
+      const d21 = new Date();
+      d21.setDate(d21.getDate() + 21);
+      setNextFollowUpDate(d21.toISOString().split('T')[0]);
+      setFollowUpDaysInterval(21);
       setPriority('high');
 
       const defaultStageNames = defaultCategory === 'JobsMgm' ? DEFAULT_MGM_STAGES : DEFAULT_TECH_STAGES;
@@ -480,7 +484,7 @@ export const JobModal: React.FC<JobModalProps> = ({
                 type="text"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="E.g., Madrid, New York, Remote"
+                placeholder="City and/or Country"
                 className="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 text-xs focus:outline-none focus:border-indigo-500"
               />
             </div>
@@ -595,7 +599,7 @@ export const JobModal: React.FC<JobModalProps> = ({
                 type="text"
                 value={salaryExpected}
                 onChange={(e) => setSalaryExpected(e.target.value)}
-                placeholder="E.g., $150,000 / yr"
+                placeholder="$60,000 - $80,000 / yr"
                 className="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 font-mono"
               />
             </div>

@@ -1,7 +1,12 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { JobOpportunity, JobStatus, STATUS_CONFIG } from '../types/job';
 import { StageBadge } from './StageBadge';
-import { getJobTimingInfo, formatStatusDateInfo } from '../services/timing';
+import {
+  getJobTimingInfo,
+  formatStatusDateInfo,
+  getLastRecordChangeInfo,
+  compareLastRecordChange
+} from '../services/timing';
 import { createGoogleCalendarUrl } from '../services/calendar';
 import {
   Building2,
@@ -30,6 +35,7 @@ import {
 } from 'lucide-react';
 
 export type JobSortKey =
+  | 'date_order'
   | 'company'
   | 'stage_progress'
   | 'next_date'
@@ -119,7 +125,8 @@ export const JobTable: React.FC<JobTableProps> = ({
   onToggleShowRejected,
   rejectedCount
 }) => {
-  const [sortKey, setSortKey] = useState<JobSortKey | null>(null);
+  const [sortKey, setSortKey] = useState<JobSortKey>('date_order');
+  const [dateSortDirection, setDateSortDirection] = useState<'desc' | 'asc'>('desc');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   
   // Custom priority selection for Application Status and Stage Progress
@@ -207,13 +214,26 @@ export const JobTable: React.FC<JobTableProps> = ({
     }
   };
 
+  const handleToggleDateOrder = () => {
+    if (sortKey === 'date_order') {
+      setDateSortDirection((prev) => (prev === 'desc' ? 'asc' : 'desc'));
+    } else {
+      setSortKey('date_order');
+    }
+  };
+
   const handleToggleSort = (key: JobSortKey) => {
+    if (key === 'date_order') {
+      handleToggleDateOrder();
+      return;
+    }
     if (sortKey === key) {
       if (sortDirection === 'asc') {
         setSortDirection('desc');
       } else {
-        // Third click clears sorting back to default
-        setSortKey(null);
+        // Third click clears sorting back to default Date Order (newest first)
+        setSortKey('date_order');
+        setDateSortDirection('desc');
         setSortDirection('asc');
       }
     } else {
@@ -223,7 +243,8 @@ export const JobTable: React.FC<JobTableProps> = ({
   };
 
   const handleResetSort = () => {
-    setSortKey(null);
+    setSortKey('date_order');
+    setDateSortDirection('desc');
     setSortDirection('asc');
   };
 
@@ -251,14 +272,16 @@ export const JobTable: React.FC<JobTableProps> = ({
   };
 
   const sortedJobs = useMemo(() => {
-    if (!sortKey) return jobs;
-
     const list = [...jobs];
 
     return list.sort((a, b) => {
       let result = 0;
 
       switch (sortKey) {
+        case 'date_order': {
+          return compareLastRecordChange(a, b, dateSortDirection);
+        }
+
         case 'stage_progress': {
           const totalA = a.stages?.length || 0;
           const compA = a.stages?.filter((s) => s.completed).length || 0;
@@ -426,12 +449,12 @@ export const JobTable: React.FC<JobTableProps> = ({
         }
 
         default:
-          result = 0;
+          return compareLastRecordChange(a, b, dateSortDirection);
       }
 
       return sortDirection === 'asc' ? result : -result;
     });
-  }, [jobs, sortKey, sortDirection, selectedStatusFirst, selectedStageTierFirst]);
+  }, [jobs, sortKey, sortDirection, dateSortDirection, selectedStatusFirst, selectedStageTierFirst]);
 
   // Pagination computations
   const totalItems = sortedJobs.length;
@@ -475,6 +498,10 @@ export const JobTable: React.FC<JobTableProps> = ({
   const getSortDescription = () => {
     if (!sortKey) return null;
     switch (sortKey) {
+      case 'date_order':
+        return dateSortDirection === 'desc'
+          ? 'Date Order: Last changed record (Newest first • Notes, Status, or Date Applied)'
+          : 'Date Order: Last changed record (Oldest first)';
       case 'stage_progress': {
         const label = STAGE_TIER_LABELS[selectedStageTierFirst] || 'Custom';
         return `1st: Stage [${label}] ➔ 2nd: Follow-up Timing (Newer to Older)`;
@@ -533,6 +560,35 @@ export const JobTable: React.FC<JobTableProps> = ({
               <ArrowUpDown className="w-3.5 h-3.5 text-indigo-400" />
               Sort by:
             </span>
+
+            {/* Date Order (Default) Pill */}
+            <button
+              onClick={handleToggleDateOrder}
+              className={`px-2.5 py-1 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ${
+                sortKey === 'date_order'
+                  ? 'bg-indigo-600 text-white border-indigo-500 shadow-sm'
+                  : 'bg-slate-900/90 text-slate-300 border-slate-800 hover:bg-slate-800 hover:text-white'
+              }`}
+              title="Sort by latest record change (Note, Status, or Date Applied)"
+            >
+              <ArrowUpDown className="w-3 h-3 text-indigo-300" />
+              <span>Date Order</span>
+              {sortKey === 'date_order' && (
+                <span className="text-[10px] font-mono bg-indigo-700/80 px-1 py-0.2 rounded flex items-center gap-0.5">
+                  {dateSortDirection === 'desc' ? (
+                    <>
+                      <span>Newest</span>
+                      <ArrowDown className="w-2.5 h-2.5" />
+                    </>
+                  ) : (
+                    <>
+                      <span>Oldest</span>
+                      <ArrowUp className="w-2.5 h-2.5" />
+                    </>
+                  )}
+                </span>
+              )}
+            </button>
 
             {/* 1. Stage Progress Pill */}
             <button
@@ -767,6 +823,36 @@ export const JobTable: React.FC<JobTableProps> = ({
       {/* Top Table Navigation & Pagination Header */}
       <div className="px-4 py-2 bg-slate-950/90 border-b border-slate-800/80 flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2.5 text-slate-400 flex-wrap">
+          {/* Button: Date Order with up and down arrows (placed to the left of Show Rejected switch button) */}
+          <button
+            type="button"
+            onClick={handleToggleDateOrder}
+            className={`px-2.5 py-1 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+              sortKey === 'date_order'
+                ? 'bg-indigo-600 hover:bg-indigo-500 text-white border-indigo-400 shadow-sm'
+                : 'bg-slate-900/90 text-slate-300 border-slate-800 hover:bg-slate-800 hover:text-white'
+            }`}
+            title={`Order by last changed date in the record (${dateSortDirection === 'desc' ? 'Newest first' : 'Oldest first'}). Click to toggle order.`}
+          >
+            <ArrowUpDown className="w-3.5 h-3.5 text-indigo-300 shrink-0" />
+            <span>Date Order</span>
+            <span className="flex items-center text-[10px] font-mono px-1 py-0.2 rounded bg-black/30 border border-white/10">
+              {dateSortDirection === 'desc' ? (
+                <>
+                  <span>Newest</span>
+                  <ArrowDown className="w-2.5 h-2.5 ml-0.5 text-indigo-200" />
+                </>
+              ) : (
+                <>
+                  <span>Oldest</span>
+                  <ArrowUp className="w-2.5 h-2.5 ml-0.5 text-amber-200" />
+                </>
+              )}
+            </span>
+          </button>
+
+          <span className="text-slate-600">•</span>
+
           {/* Switch button: Show / Hide Rejected opportunities (placed to the left of List View) */}
           {onToggleShowRejected && (
             <>
@@ -1108,52 +1194,61 @@ export const JobTable: React.FC<JobTableProps> = ({
                 >
                   {/* Column 1: Company & Title */}
                   <td className="py-3 px-4">
-                    <div className="flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-slate-800 border border-slate-700/80 flex items-center justify-center font-bold text-sm text-slate-200 shrink-0 shadow-xs group-hover:border-indigo-500/50 transition-colors">
-                        {job.company.substring(0, 2).toUpperCase()}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-white group-hover:text-indigo-300 transition-colors truncate">
-                            {job.company}
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-white group-hover:text-indigo-300 transition-colors truncate">
+                          {job.company}
+                        </span>
+                        {job.priority === 'dream_job' && (
+                          <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20 font-medium">
+                            ⭐ Top
                           </span>
-                          {job.priority === 'dream_job' && (
-                            <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20 font-medium">
-                              ⭐ Top
-                            </span>
-                          )}
-                          {job.jobUrl && (
-                            <a
-                              href={job.jobUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              onClick={(e) => e.stopPropagation()}
-                              className="text-slate-500 hover:text-indigo-400 transition-colors"
-                              title="Open original job posting"
-                            >
-                              <ExternalLink className="w-3 h-3" />
-                            </a>
-                          )}
-                        </div>
-                        <div className="text-slate-300 font-medium text-xs truncate mt-0.5">
-                          {job.title}
-                        </div>
-                        <div className="flex items-center gap-2 text-[11px] text-slate-500 mt-1">
-                          <span
-                            className={`px-1.5 py-0.2 rounded text-[10px] font-mono uppercase font-semibold ${
-                              job.category === 'JobsTech'
-                                ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
-                                : 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
-                            }`}
+                        )}
+                        {job.jobUrl && (
+                          <a
+                            href={job.jobUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-slate-500 hover:text-indigo-400 transition-colors"
+                            title="Open original job posting"
                           >
-                            {job.category}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <MapPin className="w-3 h-3 opacity-70" />
-                            <span className="truncate max-w-[120px]">{job.location}</span>
-                          </span>
-                        </div>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        )}
                       </div>
+                      <div className="text-slate-300 font-medium text-xs truncate mt-0.5">
+                        {job.title}
+                      </div>
+                      <div className="flex items-center gap-2 text-[11px] text-slate-500 mt-1">
+                        <span
+                          className={`px-1.5 py-0.2 rounded text-[10px] font-mono uppercase font-semibold ${
+                            job.category === 'JobsTech'
+                              ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20'
+                              : 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
+                          }`}
+                        >
+                          {job.category}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-3 h-3 opacity-70" />
+                          <span className="truncate max-w-[120px]">{job.location}</span>
+                        </span>
+                      </div>
+                      {/* Last Record Change indicator */}
+                      {(() => {
+                        const changeInfo = getLastRecordChangeInfo(job);
+                        return (
+                          <div
+                            className="flex items-center gap-1.5 text-[10px] font-mono mt-1 text-slate-400"
+                            title={`Last change: ${changeInfo.formattedDate} (${changeInfo.relative}) via ${changeInfo.sourceLabel}: "${changeInfo.description}"`}
+                          >
+                            <span className="text-slate-500 font-sans">Changed:</span>
+                            <span className="text-indigo-300 font-semibold">{changeInfo.formattedDate}</span>
+                            <span className="text-slate-500 font-sans">({changeInfo.sourceLabel})</span>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </td>
 

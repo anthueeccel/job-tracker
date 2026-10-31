@@ -241,7 +241,7 @@ export const FollowUpReminderModal: React.FC<FollowUpReminderModalProps> = ({
 
                       <div className="text-xs text-slate-400 mt-1">
                         {reason === 'inactivity' ? (
-                          <span>No recruiter activity for over 7 days since last update.</span>
+                          <span>No recruiter activity for over {job.followUpDaysInterval || 21} days since last update.</span>
                         ) : (
                           <span>Scheduled follow-up reminder for {job.nextFollowUpDate}.</span>
                         )}

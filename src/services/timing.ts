@@ -220,7 +220,7 @@ export function getJobTimingInfo(job: JobOpportunity): JobTimingInfo {
   const latest = pastCandidates[0];
   const diffDays = getDaysDiff(latest.date, todayStr); // <= 0
   const isTerminal = job.status === 'rejected' || job.status === 'withdrawn' || job.status === 'offer';
-  const followUpInterval = job.followUpDaysInterval || 7;
+  const followUpInterval = job.followUpDaysInterval || 21;
   const daysAgo = Math.abs(diffDays);
 
   const sourceNameMap = {
@@ -399,3 +399,205 @@ export function formatStatusDateInfo(dateStr?: string): StatusDateDisplay {
   };
 }
 
+export interface LastRecordChangeInfo {
+  timestamp: number;
+  dateStr: string; // YYYY-MM-DD
+  formattedDate: string; // DD/MM/YYYY
+  source: 'note' | 'status' | 'applied' | 'stage' | 'resume' | 'activity';
+  sourceLabel: string; // 'Note', 'Status', 'Date Applied', 'Stage', 'Resume', 'Activity'
+  description: string;
+  daysAgo: number;
+  relative: string;
+}
+
+/**
+ * Calculates the exact latest record change across Notes, Status Changes, Applied Date, Stages, Resumes.
+ * Default newest:
+ * - If the Note is the newest one, it reflects the note.
+ * - If the status change is the newest, it reflects the status.
+ * - If the Date Applied is the newest, it reflects the date applied.
+ */
+export function getLastRecordChangeInfo(job: JobOpportunity): LastRecordChangeInfo {
+  const todayStr = getTodayString();
+  interface Candidate {
+    timestamp: number;
+    dateStr: string;
+    source: 'note' | 'status' | 'applied' | 'stage' | 'resume' | 'activity';
+    sourceLabel: string;
+    description: string;
+    priority: number;
+  }
+  const candidates: Candidate[] = [];
+
+  // 1. Notes (priority 1) - checked with exact millisecond precision if ISO string
+  if (job.notes && job.notes.length > 0) {
+    for (const note of job.notes) {
+      if (note.createdAt) {
+        const t = new Date(note.createdAt).getTime();
+        if (!isNaN(t) && t > 0) {
+          const dateStr = note.createdAt.slice(0, 10);
+          candidates.push({
+            timestamp: t,
+            dateStr,
+            source: 'note',
+            sourceLabel: 'Note',
+            description: note.type === 'interview' ? 'Interview note' : 'Note added',
+            priority: 1
+          });
+        }
+      }
+    }
+  }
+
+  // 2. Status date / status change (priority 2)
+  if (job.statusDate) {
+    const raw = job.statusDate.slice(0, 10);
+    const t = new Date(`${raw}T00:00:00`).getTime();
+    if (!isNaN(t) && t > 0) {
+      candidates.push({
+        timestamp: t,
+        dateStr: raw,
+        source: 'status',
+        sourceLabel: 'Status',
+        description: 'Status updated',
+        priority: 2
+      });
+    }
+  }
+
+  // 3. Stages scheduled or completed dates (priority 3)
+  if (job.stages && job.stages.length > 0) {
+    for (const stage of job.stages) {
+      if (stage.date) {
+        const raw = stage.date.slice(0, 10);
+        const t = new Date(`${raw}T00:00:00`).getTime();
+        if (!isNaN(t) && t > 0) {
+          candidates.push({
+            timestamp: t,
+            dateStr: raw,
+            source: 'stage',
+            sourceLabel: 'Stage',
+            description: stage.name || 'Stage updated',
+            priority: 3
+          });
+        }
+      }
+    }
+  }
+
+  // 4. Resumes uploadedAt (priority 4)
+  if (job.resumes && job.resumes.length > 0) {
+    for (const resume of job.resumes) {
+      if (resume.uploadedAt) {
+        const t = new Date(resume.uploadedAt).getTime();
+        if (!isNaN(t) && t > 0) {
+          const dateStr = resume.uploadedAt.slice(0, 10);
+          candidates.push({
+            timestamp: t,
+            dateStr,
+            source: 'resume',
+            sourceLabel: 'Resume',
+            description: 'Resume uploaded',
+            priority: 4
+          });
+        }
+      }
+    }
+  }
+
+  // 5. Applied Date (priority 5)
+  if (job.appliedDate) {
+    const raw = job.appliedDate.slice(0, 10);
+    const t = new Date(`${raw}T00:00:00`).getTime();
+    if (!isNaN(t) && t > 0) {
+      candidates.push({
+        timestamp: t,
+        dateStr: raw,
+        source: 'applied',
+        sourceLabel: 'Date Applied',
+        description: 'Applied',
+        priority: 5
+      });
+    }
+  }
+
+  // 6. Last Activity Date fallback (priority 6)
+  if (job.lastActivityDate) {
+    const raw = job.lastActivityDate.slice(0, 10);
+    const t = new Date(`${raw}T00:00:00`).getTime();
+    if (!isNaN(t) && t > 0) {
+      candidates.push({
+        timestamp: t,
+        dateStr: raw,
+        source: 'activity',
+        sourceLabel: 'Activity',
+        description: 'Record updated',
+        priority: 6
+      });
+    }
+  }
+
+  // Pick candidate with highest timestamp; on timestamp tie, lower priority number wins
+  if (candidates.length > 0) {
+    candidates.sort((a, b) => {
+      if (b.timestamp !== a.timestamp) return b.timestamp - a.timestamp;
+      return a.priority - b.priority;
+    });
+    const best = candidates[0];
+    const diffDays = getDaysDiff(best.dateStr, todayStr);
+    const daysAgo = Math.abs(diffDays);
+    let relative = 'Today';
+    if (diffDays === 0) {
+      relative = 'Today';
+    } else if (diffDays < 0) {
+      relative = daysAgo === 1 ? '1d ago' : `${daysAgo}d ago`;
+    } else {
+      relative = diffDays === 1 ? 'In 1d' : `In ${diffDays}d`;
+    }
+
+    const parts = best.dateStr.split('-');
+    const formattedDate = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : best.dateStr;
+
+    return {
+      timestamp: best.timestamp,
+      dateStr: best.dateStr,
+      formattedDate,
+      source: best.source,
+      sourceLabel: best.sourceLabel,
+      description: best.description,
+      daysAgo,
+      relative
+    };
+  }
+
+  return {
+    timestamp: 0,
+    dateStr: todayStr,
+    formattedDate: todayStr,
+    source: 'applied',
+    sourceLabel: 'Date Applied',
+    description: 'Applied',
+    daysAgo: 0,
+    relative: 'Today'
+  };
+}
+
+/**
+ * Compares two jobs by their latest record change date/timestamp.
+ * Default is 'desc' (newest first).
+ */
+export function compareLastRecordChange(
+  a: JobOpportunity,
+  b: JobOpportunity,
+  direction: 'desc' | 'asc' = 'desc'
+): number {
+  const infoA = getLastRecordChangeInfo(a);
+  const infoB = getLastRecordChangeInfo(b);
+
+  if (infoA.timestamp !== infoB.timestamp) {
+    return direction === 'desc'
+      ? infoB.timestamp - infoA.timestamp
+      : infoA.timestamp - infoB.timestamp;
+  }
+  return a.company.localeCompare(b.company);
+}
